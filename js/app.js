@@ -1,11 +1,11 @@
-let toggleCards = [];
+let switchCards = [];
 let moves = 0;
-let clockOff = true;
+let timeOff = true;
 let time = 0;
 let clockId;
 let matched = 0;
 
-// RESETS CLASS OF EACH CARD TO DEFUAL 'CARD'
+// RESETS CLASS OF EACH CARD TO DEFUALt 'CARD'
 resetsCards = () => {
   const allCards = document.querySelectorAll('.deck li');
   for (let card of allCards) {
@@ -32,9 +32,8 @@ const deck = document.querySelector('.deck');
 // shuffles deck
 shuffleDeck = () => {
   const cardToShuffle = Array.from(document.querySelectorAll('.deck li'));
-  console.log('Cards to shulfe', cardToShuffle);
+  
   const shufflecards = shuffle(cardToShuffle);
-  console.log('shulffed cards', shufflecards);
   for ( card of shufflecards){
     deck.appendChild(card);
   }
@@ -42,102 +41,82 @@ shuffleDeck = () => {
 //shufles deck once
 shuffleDeck();
 
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
+// Flipps card over on each click 
+deck.addEventListener('click', event => {
+  const clickedTarget = event.target;
+  // starts timer when first card is clicked 
+  if (isClickValid(clickedTarget)) {
+    if (timeOff) {
+      timeOn();
+      timeOff = false;
+    }
+    switchCard(clickedTarget);
+    addSwitchdCard(clickedTarget);
 
-  // Flipps card over on each click 
-  deck.addEventListener('click', event => {
-    const clickTarget = event.target;
-    // only lets you flip 2 cards at a time
-    if (isClickValid(clickTarget)) {
-      if (clockOff) {
-        startClock();
-        clockOff = false;
-      }
-      toggleCard(clickTarget);
-      addToggledCard(clickTarget);
-
-      // checks when 2 cards have been clicked  
-      if (toggleCards.length === 2) {
-        console.log('2 cartas');
-        checkForMatch(clickTarget);
-        addMove();
-        checkScore(); 
-      }
-      
+    // checks when 2 cards have been clicked  
+    if (switchCards.length === 2) {
+      checkForMatch(clickedTarget);
+      addMove();
+      checkScore(); 
     }
     
-  });
-/* 
-  deck.addEventListener('click', event => {
-    const clickTarget = event.target;
-    
-    if (clockOff) {
-      startClock();  delll
-      clockOff = false;
-    } */
-
-  isClickValid = (clickTarget) => {
-    return (
-      clickTarget.classList.contains('card') &&
-      !clickTarget.classList.contains('match') &&
-      toggleCards.length < 2 && 
-      !toggleCards.includes(clickTarget)      
-    );
   }
-
-  // toggles card 
-  toggleCard = (card) => {
-    card.classList.toggle('open');
-    card.classList.toggle('show');
-  }
-  // adds each toggle to the array toggledCards
-  addToggledCard = (clickTarget) => {
-    toggleCards.push(clickTarget);
-    console.log(toggleCards);
-  }
-  // checks wheather the two cards toggled macth class id 
-  checkForMatch = () => {
-    const total_pairs = 8   ;
-    if (
-      toggleCards[0].firstElementChild.className === 
-      toggleCards[1].firstElementChild.className
-    ) {
-      toggleCards[0].classList.toggle('match'); 
-      toggleCards[1].classList.toggle('match');
-      toggleCards = [];  // maybe pop all isteead of set to nothing         
-      matched++;
-      if (matched === total_pairs){
-        gameWon();
-      }   
-    } else {
-      //this setTimeout gives it time to reset the two card that dont match to flip over back.
-      setTimeout(() => {
-        console.log('not a macth');
-        toggleCard(toggleCards[0]);
-        toggleCard(toggleCards[1]);        
-        toggleCards = [];
-      }, 1000);
-        
-      }
-  }
-
   
+});
 
-  addMove = () => {
-    moves++;
-    const movesText = document.querySelector('.moves');
-    movesText.innerHTML = moves;
-  }
+// checks that the target does NOT contain the class “match”
+isClickValid = (clickTarget) => {
+  return (
+    clickTarget.classList.contains('card') &&
+    !clickTarget.classList.contains('match') &&
+    switchCards.length < 2 && 
+    !switchCards.includes(clickTarget)      
+  );
+}
 
+// switches card 
+switchCard = (card) => {
+  card.classList.toggle('open');
+  card.classList.toggle('show');
+}
+// adds each toggle to the array toggledCards
+addSwitchdCard = (clickTarget) => {
+  switchCards.push(clickTarget);
+}
+// checks wheather the two cards toggled macth class id 
+checkForMatch = () => {
+  const total_pairs = 8   ;
+  if (
+    switchCards[0].firstElementChild.className === 
+    switchCards[1].firstElementChild.className
+  ) {
+    switchCards[0].classList.toggle('match'); 
+    switchCards[1].classList.toggle('match');
+    switchCards = [];       
+    matched++;
+    if (matched === total_pairs){
+      gameWon();
+    }   
+  } else {
+    //this setTimeout gives it time to reset the two card that dont match to flip over back.
+    setTimeout(() => {
+      console.log('not a macth');
+      switchCard(switchCards[0]);
+      switchCard(switchCards[1]);        
+      switchCards = [];
+    }, 1000);
+      
+    }
+}
+
+//increments moves by one and displays it in the html
+addMove = () => {
+  moves++;
+  const movesText = document.querySelector('.moves');
+  movesText.innerHTML = moves;
+}
+
+//checks scores to see how stars the player should have depending the moves the have. 
 checkScore = () => {
   if (moves === 10 ) {
     hideAStar();
@@ -147,6 +126,7 @@ checkScore = () => {
   }
 }
 
+//hides a star 
 hideAStar = () => {
   const startList = document.querySelectorAll('.stars li');
   for (star of  startList) {   
@@ -157,7 +137,8 @@ hideAStar = () => {
   }
 }
 
-startClock = () => {
+//starts the clock
+timeOn = () => {
   clockId = setInterval(() => {
     time++;
     displayTime();
@@ -165,11 +146,11 @@ startClock = () => {
   }, 1000);  
 }
 
+//formats time with a [00:00] format 
 displayTime = () => {
   const clock = document.querySelector('.clock');
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
-  console.log(clock);
   if (seconds < 10 ){
     clock.innerHTML = `${minutes}:0${seconds}`;
   } else {    
@@ -177,12 +158,13 @@ displayTime = () => {
   }
 }
 
+//stops the timer 
 stopClock = () => {
   clearInterval(clockId);
 }
 
-// still have to add to the the functionality 
-toggleModal = () => {
+//shows the modal
+switchModal = () => {
   const modal = document.querySelector('.modal_background');
   modal.classList.toggle('hide');
 }
@@ -201,6 +183,7 @@ writeModalStats = () => {
   starStat.innerHTML = `stars = ${stars}`;
 }
 
+// counts the number of star player has  
 getStars = () => {
   stars = document.querySelectorAll('.stars li');
   starCount = 0;
@@ -209,19 +192,18 @@ getStars = () => {
       starCount ++
     }    
   }
-  console.log(starCount);
   return starCount;
 }
+
+// turns off the modal 
 cancel = () => {
-  toggleModal();  
+  switchModal();  
 }
 
 document.querySelector('.modal_close').addEventListener('click', cancel);
 document.querySelector('.modal_cancel').addEventListener('click', cancel);
-// not sure if this goes inside what function 
 
-
-
+// restarts the game 
 resetGame = () => {
   resetClockAndTime();
   resetMoves();
@@ -234,16 +216,18 @@ resetGame = () => {
 //resets timer and clock in the popup
 resetClockAndTime = () => {
   stopClock();
-  clockOff = true;
+  timeOff = true;
   time = 0;
   displayTime();
 }
 
+// resets move count
 resetMoves = () => {
   moves = 0; 
   document.querySelector('.moves').innerHTML = moves;
 }
 
+//resets stars to 3 
 resetStars = () => {
   stars = 0; 
   const starList = document.querySelectorAll('.stars li');
@@ -251,23 +235,25 @@ resetStars = () => {
     star.style.display = 'inline';
   }
 }
+//resets game when the modal is showing
 replayGame = () => {
   resetGame();
-  toggleModal();
+  switchModal();
   resetsCards();
 }
 
+//resets matches count
 resets_mataches = () => {
   matched = 0;
 }
 
-// toggleModal();
 document.querySelector('.restart').addEventListener('click', resetGame);
 document.querySelector('.modal_replay').addEventListener('click', replayGame);
 
+//shows modal with updated stats
 gameWon = () => {
   stopClock();
   writeModalStats();
-  toggleModal();
+  switchModal();
 }
 

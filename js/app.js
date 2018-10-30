@@ -85,7 +85,7 @@ addSwitchdCard = (clickTarget) => {
 }
 // checks wheather the two cards toggled macth class id 
 checkForMatch = () => {
-  const total_pairs = 8   ;
+  const total_pairs = 8;
   if (
     switchCards[0].firstElementChild.className === 
     switchCards[1].firstElementChild.className
@@ -211,6 +211,7 @@ resetGame = () => {
   shuffleDeck();
   resetsCards();
   resets_mataches();
+  switchCards = [];
 }
 
 //resets timer and clock in the popup
